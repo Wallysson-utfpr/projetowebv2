@@ -2,23 +2,23 @@ const jwt = require("jsonwebtoken");
 
 // Middleware de autenticação
 const authMiddleware = (req, res, next) => {
-  // Verifica se há um token de autenticação no cabeçalho da solicitação
-  const token = req.headers.authorization;
-
-  if (!token) {
-    return res
-      .status(401)
-      .json({ mensagem: "Token de autenticação não fornecido" });
-  }
-
   try {
-    // Verifica e decodifica o token
-    const decodedToken = jwt.verify(token, "abobrinha123");
+    if (!req.headers.authorization) {
+      return res
+        .status(400)
+        .json({ mensagem: "Token de autenticação não fornecido" });
+    }
 
-    // Adiciona o ID do usuário decodificado ao objeto de solicitação para uso posterior
+    const [bearer, token] = req.headers.authorization.split(" ");
+    if (bearer !== "Bearer") {
+      return res
+        .status(401)
+        .json({ mensagem: "Token de autenticação inválido" });
+    }
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+
     req.userId = decodedToken.id;
-
-    // Chama o próximo middleware ou rota
     next();
   } catch (error) {
     return res.status(401).json({ mensagem: "Token de autenticação inválido" });

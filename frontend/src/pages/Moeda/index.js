@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "../../axiosConfig";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./styles.css";
+import { io } from "socket.io-client"; // Importe a função `io` do `socket.io-client`
 
 function FormularioMoeda() {
   const [nome, setNome] = useState("");
@@ -16,18 +17,31 @@ function FormularioMoeda() {
     setBaixa("");
   };
 
+  useEffect(() => {
+    const socket = io("http://localhost:3000");
+
+    socket.on("novamoeda", (moeda) => {
+      console.log("Nova moeda cadastrada:", moeda);
+    });
+  }, []);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      const token = localStorage.getItem("token");
+      axios.defaults.headers.authorization = `Bearer ${token}`;
       const response = await axios.post("/moedas", {
         nome,
         alta,
         baixa,
       });
+
       console.log(response.data);
+
       toast.success("Moeda cadastrada com sucesso!", {
         autoClose: 1000,
       });
+
       limpaForm();
     } catch (error) {
       console.error(error);

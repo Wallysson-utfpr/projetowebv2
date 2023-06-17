@@ -11,6 +11,8 @@ function ListaMoeda() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const token = localStorage.getItem("token");
+        axios.defaults.headers.authorization = `Bearer ${token}`;
         const response = await axios.get("/moedas", {
           withCredentials: true,
         });

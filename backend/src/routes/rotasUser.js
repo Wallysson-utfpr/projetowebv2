@@ -9,6 +9,7 @@ const rateLimit = require("express-rate-limit");
 const slowDown = require("express-slow-down");
 const winston = require("winston");
 const { body } = require("express-validator");
+const authMiddleware = require("../middleware/authMiddleware");
 
 // Configuração do limite de taxa (Rate Limiting)
 const limiter = rateLimit({
@@ -32,7 +33,7 @@ const logger = winston.createLogger({
 
 module.exports = (io) => {
   // Rota para listar todas as moedas com Redis cache
-  router.get("/moedas", async (req, res) => {
+  router.get("/moedas", authMiddleware, async (req, res) => {
     try {
       const redisClient = req.redisClient;
 
@@ -60,8 +61,8 @@ module.exports = (io) => {
   // Rota para autenticação
   router.post(
     "/authenticate",
-    limiter, // Aplicação do limite de taxa
-    speedLimiter, // Aplicação da desaceleração
+    limiter,
+    speedLimiter,
     [body("email").trim(), body("senha").trim()],
     async (req, res) => {
       let { email, senha } = req.body;
@@ -79,9 +80,11 @@ module.exports = (io) => {
         if (user) {
           const match = await bcrypt.compare(senha, user.senha);
           if (match) {
-            const token = jwt.sign({ id: user._id }, "abobrinha123", {
+            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
               expiresIn: "1h",
             });
+
+            // Armazenar token no Local Storage
             res.status(200).json({ token });
           } else {
             logger.error("Erro de autenticação: E-mail ou senha incorretos");
@@ -123,7 +126,7 @@ module.exports = (io) => {
   );
 
   // Rota para cadastrar uma moeda
-  router.post("/moedas", async (req, res, next) => {
+  router.post("/moedas", authMiddleware, async (req, res, next) => {
     const { nome, alta, baixa } = req.body;
     console.log("Token recebido:", req.headers.authorization);
 
@@ -133,11 +136,11 @@ module.exports = (io) => {
       const redisClient = req.redisClient;
       redisClient.del("moedas");
 
+      // Emita uma atualização para os clientes conectados
+      io.emit("novamoeda", moeda);
+
       // Registro da postagem
       logger.info("Moeda cadastrada:", { nome });
-
-      // Emita uma atualização para os clientes conectados
-      io.emit("atualizacao", "Nova moeda cadastrada!");
 
       res.status(200).json({ mensagem: "Moeda cadastrada com sucesso" });
 

@@ -36,6 +36,7 @@ function Login() {
         const token = response.data.token;
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         setToken(token);
+        localStorage.setItem("token", token); // aqui o token no LocalStorage
         toast.success("Login realizado com sucesso!", {
           autoClose: 1000,
           onClose: handleRedirect,
