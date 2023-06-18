@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./styles.css";
-import { io } from "socket.io-client"; // Importe a função `io` do `socket.io-client`
+import { io } from "socket.io-client";
 
 function FormularioMoeda() {
   const [nome, setNome] = useState("");
@@ -22,6 +22,14 @@ function FormularioMoeda() {
 
     socket.on("novamoeda", (moeda) => {
       console.log("Nova moeda cadastrada:", moeda);
+      toast.success("Nova moeda cadastrada com sucesso usando WebSockets!", {
+        autoClose: 1000,
+      });
+    });
+
+    // Listener para evento de sucesso
+    socket.on("moedasuccess", (mensagem) => {
+      toast.success(mensagem, { autoClose: 1000 });
     });
   }, []);
 
@@ -30,21 +38,19 @@ function FormularioMoeda() {
     try {
       const token = localStorage.getItem("token");
       axios.defaults.headers.authorization = `Bearer ${token}`;
-      const response = await axios.post("/moedas", {
+      await axios.post("http://localhost:3001/moedas", {
         nome,
         alta,
         baixa,
       });
-
-      console.log(response.data);
-
-      toast.success("Moeda cadastrada com sucesso!", {
+      // Toast substitui o alert
+      toast.success("Moedas enviadas com sucesso usando WebSockets!", {
         autoClose: 1000,
       });
-
       limpaForm();
     } catch (error) {
-      console.error(error);
+      console.error("Erro ao enviar a moeda:", error);
+      toast.error("Erro ao cadastrar a moeda", { autoClose: 1000 });
     }
   };
 
