@@ -125,33 +125,6 @@ module.exports = (io) => {
     }
   );
 
-  // Rota para cadastrar uma moeda
-  router.post("/moedas", authMiddleware, async (req, res, next) => {
-    const { nome, alta, baixa } = req.body;
-    console.log("Token recebido:", req.headers.authorization);
-
-    const moeda = new Moeda({ nome, alta, baixa });
-    try {
-      await moeda.save();
-      const redisClient = req.redisClient;
-      redisClient.del("moedas");
-
-      // Emita uma atualização para os clientes conectados
-      io.emit("novamoeda", moeda);
-
-      // Registro da postagem
-      logger.info("Moeda cadastrada:", { nome });
-
-      res.status(200).json({ mensagem: "Moeda cadastrada com sucesso" });
-
-      next(); // Chama o próximo middleware ou rota após a resposta ser enviada
-    } catch (err) {
-      logger.error("Erro ao cadastrar a moeda:", err);
-      console.error(err);
-      res.status(500).json({ mensagem: "Erro ao cadastrar a moeda" });
-    }
-  });
-
   // Rota para atualizar uma moeda
   router.put("/moedas/:id", async (req, res) => {
     try {
@@ -203,23 +176,39 @@ module.exports = (io) => {
     }
   });
 
-  // Rota para enviar e-mail utilizando RabbitMQ
-  router.post("/emailPage", (req, res) => {
-    const { destinatario, assunto, conteudo } = req.body;
-    const tarefa = { destinatario, assunto, conteudo };
+  // Rota para enviar moedas utilizando RabbitMQ
+  router.post("/moedas", (req, res, next) => {
+    const { nome, alta, baixa } = req.body;
+    const moedas = { nome, alta, baixa };
 
     rabbitmq
-      .enviarTarefaParaFila(tarefa)
+      .enviarTarefaParaFila(moedas)
       .then(() => {
-        res.status(200).json({
-          message: "Tarefa de envio de e-mail enfileirada com sucesso.",
-        });
+        try {
+          const redisClient = req.redisClient;
+          redisClient.del("moedas");
+
+          // Emita uma atualização para os clientes conectados
+          io.emit("novamoeda", moedas);
+
+          // Emita um evento de sucesso
+          io.emit("moedasuccess", "Moeda cadastrada com sucesso");
+
+          // Registro da postagem
+          logger.info("Moeda cadastrada:", { nome });
+
+          res.status(200).json({ mensagem: "Moeda cadastrada com sucesso" });
+
+          next(); // Chama o próximo middleware ou rota após a resposta ser enviada
+        } catch (err) {
+          logger.error("Erro ao cadastrar a moeda:", err);
+          console.error(err);
+          res.status(500).json({ mensagem: "Erro ao cadastrar a moeda" });
+        }
       })
       .catch((error) => {
-        console.error("Erro ao enfileirar a tarefa de envio de e-mail:", error);
-        res
-          .status(500)
-          .json({ error: "Erro ao enfileirar a tarefa de envio de e-mail." });
+        console.error("Erro ao enfileirar as moedas de envio", error);
+        res.status(500).json({ error: "Erro ao enfileirar as moedas" });
       });
   });
 
