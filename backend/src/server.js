@@ -9,6 +9,7 @@ const cors = require("cors");
 const redis = require("redis");
 const https = require("https");
 const fs = require("fs");
+const rabbitmq = require("./rabbitmq");
 
 const options = {
   key: fs.readFileSync("./chave_privada.key"),
@@ -17,6 +18,8 @@ const options = {
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+rabbitmq.iniciarConsumidor();
 
 // Configurar o CORS com opções específicas
 app.use(
@@ -46,21 +49,6 @@ app.use((req, res, next) => {
 app.use("/", usuarioRouter);
 
 conectDatabase();
-
-io.on("connection", (socket) => {
-  console.log("Novo cliente conectado");
-  console.log("Cliente conectado: " + socket.id);
-
-  // Exemplo: Enviando atualização para o cliente a cada segundo
-  setInterval(() => {
-    const mensagem = "Esta é uma atualização para o usuário!";
-    socket.emit("atualizacao", mensagem);
-  }, 1000);
-
-  socket.on("disconnect", () => {
-    console.log("Cliente desconectado");
-  });
-});
 
 https.createServer(options, app).listen(443, () => {
   console.log("Servidor HTTPS iniciado na porta 443");
