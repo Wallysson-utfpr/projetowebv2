@@ -9,7 +9,6 @@ const cors = require("cors");
 const redis = require("redis");
 const https = require("https");
 const fs = require("fs");
-const { enviarTarefaParaFila } = require("./services/rabbitmq");
 
 const options = {
   key: fs.readFileSync("./chave_privada.key"),
