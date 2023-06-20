@@ -10,14 +10,19 @@ const slowDown = require("express-slow-down");
 const winston = require("winston");
 const { body } = require("express-validator");
 const authMiddleware = require("../middleware/authMiddleware");
+const tokenBlacklist = require("../middleware/tokenBlacklist");
 
-// Configuração do limite de taxa (Rate Limiting)
+//Configuração do limite de taxa (Rate Limiting)
+//controla solicitações de IP em uma rota específica por período de tempo,
+//evitando ataques de força bruta e DDoS.
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
   max: 100, // limite de 100 solicitações por IP
 });
 
-// Configuração de desaceleração (Slow Down)
+//Configuração de desaceleração (Slow Down)
+//atrasa respostas a solicitações de IP após um número definido,
+//protegendo contra ataques automatizados.
 const speedLimiter = slowDown({
   windowMs: 15 * 60 * 1000, // 15 minutos
   delayAfter: 100, // após 100 solicitações, começa a atrasar
@@ -32,6 +37,20 @@ const logger = winston.createLogger({
 });
 
 module.exports = (io) => {
+  // Rota para logout
+  router.post("/logout", authMiddleware, (req, res) => {
+    try {
+      const token = req.headers.authorization.split(" ")[1];
+      //Adiciona tokens a uma lista negra
+      tokenBlacklist.add(token);
+      res.status(200).json({ message: "Logout realizado com sucesso" });
+      console.log("Token adicionado à black List.");
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Erro ao realizar logout" });
+    }
+  });
+
   // Rota para listar todas as moedas com Redis cache
   router.get("/moedas", authMiddleware, async (req, res) => {
     try {
@@ -67,7 +86,7 @@ module.exports = (io) => {
     async (req, res) => {
       let { email, senha } = req.body;
 
-      // Remover caracteres indesejados do email e senha
+      //Sanitização de dados de entrada:
       email = email.replace(/[^\w@.-]/g, "");
       senha = senha.replace(/[^\w]/g, "");
 

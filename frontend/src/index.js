@@ -39,8 +39,22 @@ root.render(
           </PrivateRoute>
         }
       />
-      <Route path="/cadastroMoeda" element={<Moeda />} />
-      {<Route path="/listaMoeda" element={<ListaMoeda />} />}
+      <Route
+        path="/cadastroMoeda"
+        element={
+          <PrivateRoute>
+            <Moeda />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/listaMoeda"
+        element={
+          <PrivateRoute>
+            <ListaMoeda />
+          </PrivateRoute>
+        }
+      />
     </Routes>
   </BrowserRouter>
 );
