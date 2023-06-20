@@ -31,9 +31,6 @@ function HomePage() {
         <button className="btn-padrao" onClick={redirectLista}>
           Listar Moedas
         </button>
-        <button className="btn-padrao" onClick={redirectEmail}>
-          Enviar E-mail com rabbitmq
-        </button>
         <div className="logout-btn">
           <input
             type="button"

@@ -140,7 +140,6 @@ module.exports = (io) => {
       const redisClient = req.redisClient;
       redisClient.del("moedas");
 
-      // Emita uma atualização para os clientes conectados
       io.emit("atualizacao", "Moeda atualizada!");
 
       res.status(200).json({ mensagem: "Moeda editada com sucesso", moeda });
@@ -166,7 +165,7 @@ module.exports = (io) => {
       // Registro da exclusão da moeda
       logger.info("Moeda excluída:", { nome: moeda.nome });
 
-      // Emita uma atualização para os clientes conectados
+      // Emitindo uma atualização para os clientes conectados
       io.emit("atualizacao", "Moeda excluída!");
 
       res.status(200).json({ mensagem: "Moeda excluída com sucesso" });
@@ -188,10 +187,8 @@ module.exports = (io) => {
           const redisClient = req.redisClient;
           redisClient.del("moedas");
 
-          // Emita uma atualização para os clientes conectados
           io.emit("novamoeda", moedas);
 
-          // Emita um evento de sucesso
           io.emit("moedasuccess", "Moeda cadastrada com sucesso");
 
           // Registro da postagem
