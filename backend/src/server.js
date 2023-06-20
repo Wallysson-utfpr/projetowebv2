@@ -9,7 +9,7 @@ const cors = require("cors");
 const redis = require("redis");
 const https = require("https");
 const fs = require("fs");
-const rabbitmq = require("./rabbitmq");
+const { enviarTarefaParaFila } = require("./services/rabbitmq");
 
 const options = {
   key: fs.readFileSync("./chave_privada.key"),
@@ -18,8 +18,6 @@ const options = {
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-rabbitmq.iniciarConsumidor();
 
 // Configurar o CORS com opções específicas
 app.use(

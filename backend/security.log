@@ -127,3 +127,17 @@
 {"level":"info","message":"Moeda cadastrada:","nome":"aa"}
 {"level":"info","message":"Busca de moedas realizada"}
 {"level":"info","message":"Moeda excluída:","nome":"aa"}
+{"level":"info","message":"Moeda cadastrada:","nome":"aaa"}
+{"level":"info","message":"Busca de moedas realizada"}
+{"level":"info","message":"Moeda excluída:","nome":"aaa"}
+{"level":"error","message":"Erro de autenticação: E-mail ou senha incorretos"}
+{"level":"info","message":"Moeda cadastrada:","nome":"aaa"}
+{"level":"info","message":"Busca de moedas realizada"}
+{"level":"info","message":"Moeda excluída:","nome":"teste12"}
+{"level":"error","message":"Erro de autenticação: E-mail ou senha incorretos"}
+{"level":"info","message":"Moeda cadastrada:","nome":"aaa"}
+{"level":"info","message":"Moeda cadastrada:","nome":"aaaw"}
+{"level":"info","message":"Busca de moedas realizada"}
+{"level":"info","message":"Moeda cadastrada:","nome":"aa"}
+{"level":"info","message":"Moeda cadastrada:","nome":"3"}
+{"level":"info","message":"Moeda cadastrada:","nome":"4"}
