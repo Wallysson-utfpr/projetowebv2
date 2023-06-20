@@ -18,10 +18,6 @@ function HomePage() {
     window.location.href = "/listaMoeda";
   };
 
-  const redirectEmail = () => {
-    window.location.href = "/emailPage";
-  };
-
   return (
     <div className="container">
       <div className="menu">
