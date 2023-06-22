@@ -4,7 +4,6 @@ import axios from "../../axiosConfig";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { setToken } from "../../services/auth";
-
 import "./styles.css";
 
 function Login() {
@@ -55,7 +54,7 @@ function Login() {
       }
     } catch (error) {
       if (error.response.status === 401) {
-        setFeedbackMessage("E-mail ou senha incorretos");
+        setFeedbackMessage("E-mail ou senha incorretos!");
       } else if (error.response.status === 429) {
         setFeedbackMessage(error.response.data.mensagem);
         setTimeLeft(5); //tempo restante para 5 segundos
