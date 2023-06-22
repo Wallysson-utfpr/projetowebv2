@@ -16,7 +16,8 @@ function Cadastro() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (senha.length < 5) {
-      toast.error("A senha deve ter no mínimo 5 caracteres.");
+      const toastId = toast.error("A senha deve ter no mínimo 5 caracteres.");
+      setTimeout(() => toast.dismiss(toastId), 3000);
       return;
     }
     try {
@@ -25,14 +26,15 @@ function Cadastro() {
         senha,
       });
       console.log(response.data);
-      toast.success("Cadastro realizado com sucesso!", {
-        autoClose: 800,
+      const toastId = toast.success("Cadastro realizado com sucesso!", {
         onClose: handleRedirect,
       });
+      setTimeout(() => toast.dismiss(toastId), 3000);
     } catch (error) {
       console.error(error);
       if (error.response) {
-        toast.error(error.response.data.errors[0].msg, { autoClose: 500 });
+        const toastId = toast.error(error.response.data.errors[0].msg);
+        setTimeout(() => toast.dismiss(toastId), 3000);
       }
     }
   };
