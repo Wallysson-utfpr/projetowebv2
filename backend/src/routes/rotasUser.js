@@ -49,6 +49,10 @@ module.exports = (io) => {
       let { email, senha } = req.body;
 
       // Sanitização de dados de entrada:
+      
+      console.log("Email digitado:", email);
+      console.log("Senha digitada:", senha);
+      
       email = email.replace(/[^\w@.-]/g, "");
       senha = senha.replace(/[^\w]/g, "");
 
@@ -112,7 +116,7 @@ module.exports = (io) => {
       } catch (error) {
         logger.error("Erro ao realizar a autenticação:", error);
         console.error(error);
-        res.status(500).json({ mensagem: "Erro ao realizar a autenticação" });
+        res.status(500).json({ mensagem: "Erro ao realizar a autenticação!" });
       }
     }
   );
@@ -123,11 +127,11 @@ module.exports = (io) => {
       const token = req.headers.authorization.split(" ")[1];
       //Adiciona tokens a uma lista negra
       tokenBlacklist.add(token);
-      res.status(200).json({ message: "Logout realizado com sucesso" });
-      console.log("Token adicionado à black List.");
+      res.status(200).json({ message: "Logout realizado com sucesso!" });
+      console.log("Token adicionado à black List: " + token);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Erro ao realizar logout" });
+      res.status(500).json({ message: "Erro ao realizar logout!" });
     }
   });
 
@@ -197,10 +201,10 @@ module.exports = (io) => {
 
       io.emit("atualizacao", "Moeda atualizada!");
 
-      res.status(200).json({ mensagem: "Moeda editada com sucesso", moeda });
+      res.status(200).json({ mensagem: "Moeda editada com sucesso!", moeda });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ mensagem: "Erro ao editar a moeda" });
+      res.status(500).json({ mensagem: "Erro ao editar a moeda!" });
     }
   });
 
@@ -211,7 +215,7 @@ module.exports = (io) => {
       const moeda = await Moeda.findByIdAndDelete(id);
 
       if (!moeda) {
-        return res.status(404).json({ mensagem: "Moeda não encontrada" });
+        return res.status(404).json({ mensagem: "Moeda não encontrada!" });
       }
 
       const redisClient = req.redisClient;
@@ -223,10 +227,10 @@ module.exports = (io) => {
       // Emitindo uma atualização para os clientes conectados
       io.emit("atualizacao", "Moeda excluída!");
 
-      res.status(200).json({ mensagem: "Moeda excluída com sucesso" });
+      res.status(200).json({ mensagem: "Moeda excluída com sucesso!" });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ mensagem: "Erro ao excluir a moeda" });
+      res.status(500).json({ mensagem: "Erro ao excluir a moeda!" });
     }
   });
 
@@ -244,23 +248,23 @@ module.exports = (io) => {
 
           io.emit("novamoeda", moedas);
 
-          io.emit("moedasuccess", "Moeda cadastrada com sucesso");
+          io.emit("moedasuccess", "Moeda cadastrada com sucesso!");
 
           // Registro da postagem
           logger.info("Moeda cadastrada:", { nome });
 
-          res.status(200).json({ mensagem: "Moeda cadastrada com sucesso" });
+          res.status(200).json({ mensagem: "Moeda cadastrada com sucesso!" });
 
           next(); // Chama o próximo middleware ou rota após a resposta ser enviada
         } catch (err) {
           logger.error("Erro ao cadastrar a moeda:", err);
           console.error(err);
-          res.status(500).json({ mensagem: "Erro ao cadastrar a moeda" });
+          res.status(500).json({ mensagem: "Erro ao cadastrar a moeda!" });
         }
       })
       .catch((error) => {
-        console.error("Erro ao enfileirar as moedas de envio", error);
-        res.status(500).json({ error: "Erro ao enfileirar as moedas" });
+        console.error("Erro ao enfileirar as moedas de envio :", error);
+        res.status(500).json({ error: "Erro ao enfileirar as moedas!" });
       });
   });
 
