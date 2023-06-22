@@ -9,6 +9,7 @@ const cors = require("cors");
 const redis = require("redis");
 const https = require("https");
 const fs = require("fs");
+const helmet = require("helmet"); //proteção contra XSS
 
 const options = {
   key: fs.readFileSync("./chave_privada.key"),
@@ -25,6 +26,8 @@ app.use(
     credentials: true, // Permitir o envio de cookies de autenticação (se aplicável)
   })
 );
+
+app.use(helmet());
 
 let redisClient;
 

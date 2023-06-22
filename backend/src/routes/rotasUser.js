@@ -8,9 +8,10 @@ const bcrypt = require("bcrypt");
 const rateLimit = require("express-rate-limit");
 const slowDown = require("express-slow-down");
 const winston = require("winston");
-const { body } = require("express-validator");
+const { body, validationResult } = require("express-validator");
 const authMiddleware = require("../middleware/authMiddleware");
 const tokenBlacklist = require("../middleware/tokenBlacklist");
+const sanitizeHtml = require("sanitize-html");
 
 //Configuração do limite de taxa (Rate Limiting)
 //controla solicitações de IP em uma rota específica por período de tempo,
@@ -49,10 +50,10 @@ module.exports = (io) => {
       let { email, senha } = req.body;
 
       // Sanitização de dados de entrada:
-      
+
       console.log("Email digitado:", email);
       console.log("Senha digitada:", senha);
-      
+
       email = email.replace(/[^\w@.-]/g, "");
       senha = senha.replace(/[^\w]/g, "");
 
@@ -165,15 +166,36 @@ module.exports = (io) => {
     "/users",
     limiter, // Aplicação do limite de taxa
     speedLimiter, // Aplicação da desaceleração
-    [body("email").trim(), body("senha").trim()],
+    [
+      // Verifique se o e-mail é válido e normaliza
+      body("email").isEmail().normalizeEmail(),
+
+      // Verifique se a senha tem pelo menos 5 caracteres e escapa de caracteres HTML
+      body("senha")
+        .isLength({ min: 5 })
+        .withMessage("A senha deve ter no mínimo 5 caracteres.")
+        .escape(),
+    ],
     async (req, res) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        // Se houver erros de validação, retorna como resposta
+        return res.status(400).json({ errors: errors.array() });
+      }
+
       const { email, senha } = req.body;
 
       try {
         // Gerar o hash da senha
         const hashedSenha = await bcrypt.hash(senha, 10);
 
-        const user = new Usuario({ email, senha: hashedSenha });
+        // Sanitize-html para garantir que o conteúdo do email não contenha nada além de texto puro.
+        const sanitizedEmail = sanitizeHtml(email, {
+          allowedTags: [],
+          allowedAttributes: {},
+        });
+
+        const user = new Usuario({ email: sanitizedEmail, senha: hashedSenha });
 
         await user.save();
         res.status(200).json({ mensagem: "Usuário cadastrado com sucesso" });

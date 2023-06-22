@@ -15,6 +15,10 @@ function Cadastro() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (senha.length < 5) {
+      toast.error("A senha deve ter no mínimo 5 caracteres.");
+      return;
+    }
     try {
       const response = await axios.post("/users", {
         email,
@@ -22,11 +26,14 @@ function Cadastro() {
       });
       console.log(response.data);
       toast.success("Cadastro realizado com sucesso!", {
-        autoClose: 1000,
+        autoClose: 800,
         onClose: handleRedirect,
       });
     } catch (error) {
       console.error(error);
+      if (error.response) {
+        toast.error(error.response.data.errors[0].msg, { autoClose: 500 });
+      }
     }
   };
 
@@ -63,7 +70,7 @@ function Cadastro() {
                 value="Cadastrar"
                 className="bt-cadastrar"
               />
-              <ToastContainer />
+              <ToastContainer draggablePercent={0} />
 
               <Link className="bt-voltar-cadastro" to="/">
                 Voltar

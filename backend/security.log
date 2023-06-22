@@ -222,3 +222,7 @@
 {"level":"info","message":"Moeda cadastrada:","nome":"aaaaa"}
 {"level":"info","message":"Busca de moedas realizada"}
 {"level":"info","message":"Moeda excluída:","nome":"aaaaa"}
+{"level":"error","message":"Erro de autenticação: E-mail ou senha incorretos"}
+{"level":"info","message":"Moeda cadastrada:","nome":"aa"}
+{"level":"info","message":"Busca de moedas realizada"}
+{"level":"info","message":"Moeda excluída:","nome":"aa"}
