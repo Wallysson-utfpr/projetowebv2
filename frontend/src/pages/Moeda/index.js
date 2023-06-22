@@ -43,6 +43,7 @@ function FormularioMoeda() {
         alta,
         baixa,
       });
+      
       // Toast substitui o alert
       toast.success("Moedas enviadas com sucesso usando WebSockets!", {
         autoClose: 1000,
@@ -50,7 +51,7 @@ function FormularioMoeda() {
       limpaForm();
     } catch (error) {
       console.error("Erro ao enviar a moeda:", error);
-      toast.error("Erro ao cadastrar a moeda", { autoClose: 1000 });
+      toast.error("Erro ao cadastrar a moeda!", { autoClose: 1000 });
     }
   };
 
