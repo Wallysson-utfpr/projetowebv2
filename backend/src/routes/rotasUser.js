@@ -37,6 +37,86 @@ const logger = winston.createLogger({
 });
 
 module.exports = (io) => {
+  // Rota para autenticação
+  let loginAttempts = {}; //quantidade de tentativas e o tempo da última tentativa
+
+  router.post(
+    "/authenticate",
+    limiter,
+    speedLimiter,
+    [body("email").trim(), body("senha").trim()],
+    async (req, res) => {
+      let { email, senha } = req.body;
+
+      // Sanitização de dados de entrada:
+      email = email.replace(/[^\w@.-]/g, "");
+      senha = senha.replace(/[^\w]/g, "");
+
+      console.log("Email sanitizado:", email);
+      console.log("Senha sanitizada:", senha);
+
+      try {
+        // Verifica se o usuário já tentou logar antes
+        if (loginAttempts[email] && loginAttempts[email].attempts >= 3) {
+          const now = Date.now();
+          const diff = (now - loginAttempts[email].last) / 1000;
+
+          // Se ainda não passou 5 segundos desde a última tentativa
+          if (diff < 5) {
+            return res.status(429).json({
+              mensagem: "Tente novamente!",
+            });
+          }
+        }
+
+        const user = await Usuario.findOne({ email: email });
+
+        if (user) {
+          const match = await bcrypt.compare(senha, user.senha);
+          if (match) {
+            // Reseta as tentativas
+            loginAttempts[email] = { attempts: 0, last: Date.now() };
+
+            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+              expiresIn: "1h",
+            });
+
+            // Armazenar token no Local Storage
+            res.status(200).json({ token });
+          } else {
+            if (!loginAttempts[email]) {
+              // Cria o controle para o usuário
+              loginAttempts[email] = { attempts: 0, last: Date.now() };
+            }
+
+            // Incrementa as tentativas
+            loginAttempts[email].attempts++;
+            loginAttempts[email].last = Date.now();
+
+            logger.error("Erro de autenticação: E-mail ou senha incorretos");
+            res.status(401).json({ mensagem: "E-mail ou senha incorretos" });
+          }
+        } else {
+          if (!loginAttempts[email]) {
+            // Cria o controle para o usuário
+            loginAttempts[email] = { attempts: 0, last: Date.now() };
+          }
+
+          // Incrementa as tentativas
+          loginAttempts[email].attempts++;
+          loginAttempts[email].last = Date.now();
+
+          logger.error("Erro de autenticação: E-mail ou senha incorretos");
+          res.status(401).json({ mensagem: "E-mail ou senha incorretos" });
+        }
+      } catch (error) {
+        logger.error("Erro ao realizar a autenticação:", error);
+        console.error(error);
+        res.status(500).json({ mensagem: "Erro ao realizar a autenticação" });
+      }
+    }
+  );
+
   // Rota para logout
   router.post("/logout", authMiddleware, (req, res) => {
     try {
@@ -76,50 +156,6 @@ module.exports = (io) => {
       res.status(500).json({ mensagem: "Erro ao obter as moedas" });
     }
   });
-
-  // Rota para autenticação
-  router.post(
-    "/authenticate",
-    limiter,
-    speedLimiter,
-    [body("email").trim(), body("senha").trim()],
-    async (req, res) => {
-      let { email, senha } = req.body;
-
-      //Sanitização de dados de entrada:
-      email = email.replace(/[^\w@.-]/g, "");
-      senha = senha.replace(/[^\w]/g, "");
-
-      console.log("Email sanitizado:", email);
-      console.log("Senha sanitizada:", senha);
-
-      try {
-        const user = await Usuario.findOne({ email: email });
-
-        if (user) {
-          const match = await bcrypt.compare(senha, user.senha);
-          if (match) {
-            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-              expiresIn: "1h",
-            });
-
-            // Armazenar token no Local Storage
-            res.status(200).json({ token });
-          } else {
-            logger.error("Erro de autenticação: E-mail ou senha incorretos");
-            res.status(401).json({ mensagem: "E-mail ou senha incorretos" });
-          }
-        } else {
-          logger.error("Erro de autenticação: E-mail ou senha incorretos");
-          res.status(401).json({ mensagem: "E-mail ou senha incorretos" });
-        }
-      } catch (error) {
-        logger.error("Erro ao realizar a autenticação:", error);
-        console.error(error);
-        res.status(500).json({ mensagem: "Erro ao realizar a autenticação" });
-      }
-    }
-  );
 
   router.post(
     "/users",

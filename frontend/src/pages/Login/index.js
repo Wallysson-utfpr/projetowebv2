@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "../../axiosConfig";
 import { ToastContainer, toast } from "react-toastify";
@@ -11,6 +11,17 @@ function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [timeLeft, setTimeLeft] = useState(0); //controla o tempo restante
+
+  useEffect(() => {
+    //Tempo restante é maior que 0, reduz o valor a cada segundo
+    if (timeLeft > 0) {
+      const timer = setTimeout(() => {
+        setTimeLeft(timeLeft - 1);
+      }, 1000);
+      return () => clearTimeout(timer); // Limpa o timeout se o componente for desmontado
+    }
+  }, [timeLeft]);
 
   const handleEmail = (event) => {
     setEmail(event.target.value);
@@ -45,6 +56,9 @@ function Login() {
     } catch (error) {
       if (error.response.status === 401) {
         setFeedbackMessage("E-mail ou senha incorretos");
+      } else if (error.response.status === 429) {
+        setFeedbackMessage(error.response.data.mensagem);
+        setTimeLeft(5); //tempo restante para 5 segundos
       } else {
         console.error(error);
       }
@@ -77,7 +91,12 @@ function Login() {
               />
               <span className="login-input-border"></span>
               {feedbackMessage && (
-                <p className="feedback-message">{feedbackMessage}</p>
+                <p className="feedback-message">
+                  {feedbackMessage}
+                  {timeLeft > 0
+                    ? `Tente novamente em ${timeLeft} segundos.`
+                    : ""}
+                </p>
               )}
               <input
                 type="submit"
