@@ -5,21 +5,21 @@
   text-align: center;
   font-family: Arial, sans-serif;
   margin-top: 3%;
-  }
+}
   
-  h1 {
+h1 {
   font-size: 32px;
   margin-bottom: 20px;
-  }
+}
   
-  form {
+form {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-bottom: 8%;
-  }
+}
   
-  input {
+input {
   width: 300px;
   height: 30px;
   padding: 10px;
@@ -27,9 +27,9 @@
   border: none;
   font-size: 16px;
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-  }
+}
   
-  button {
+button {
   margin-left: 10px;
   padding: 10px;
   background-color: #0077ff;
@@ -39,55 +39,53 @@
   cursor: pointer;
   font-size: 18px;
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-  }
+}
   
-  button:hover {
+button:hover {
   background-color: #0066cc;
-  }
+}
   
-  ul {
+ul {
   list-style: none;
   padding: 0;
   margin: 0;
-  }
+}
   
-  li {
+li {
   font-size: 18px;
   margin-top: 3%;
-  }
+}
 
-  .corWhite {
-    color: rgb(14, 29, 197);
-  }
+.corWhite {
+  color: rgb(14, 29, 197);
+}
 
-  .bt-excluir,
-    .bt-cancelar {
-    background-color: red;
-    margin-top: 5%;
-  }
+.bt-excluir, .bt-cancelar {
+  background-color: red;
+  margin-top: 5%;
+}
 
-  .bt-voltar {
-    display: flex;
-    justify-content: center;
-    font-family: sans-serif;
-    height: 40px;
-    width: 40%;
-    background: black;
-    color: #fff;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: 0.5s, ease;
-    text-decoration: none;
-    margin-top: 5%;
-    margin-left: 30%;
-    flex-direction: column;
-    margin-bottom: 20px;
-  }
+.bt-voltar {
+  display: flex;
+  justify-content: center;
+  font-family: sans-serif;
+  height: 40px;
+  width: 40%;
+  background: black;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: 0.5s, ease;
+  text-decoration: none;
+  margin-top: 5%;
+  margin-left: 30%;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
 
-  .bt-voltar:hover {
-    background-color: #33ba9f;
-    margin-bottom: 20px;
-
-  }
+.bt-voltar:hover {
+  background-color: #33ba9f;
+  margin-bottom: 20px;
+}
