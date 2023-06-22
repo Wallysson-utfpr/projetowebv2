@@ -1,7 +1,6 @@
 const amqp = require("amqplib");
 
-//Conectar-se ao servidor RabbitMQ
-//e criar um canal de mensagens.
+// Conectar-se ao servidor RabbitMQ e criar um canal de mensagens.
 const connect = async () => {
   try {
     const connection = await amqp.connect("amqp://localhost:5672");
@@ -30,11 +29,11 @@ const enviarTarefaParaFila = async (tarefa, queueName = "fila_de_moedas") => {
     const { connection, channel } = await connect();
 
     if (!connection) {
-      throw new Error("Falha ao estabelecer conexão com o RabbitMQ");
+      throw new Error("Falha ao estabelecer conexão com o RabbitMQ!");
     }
 
     if (!channel) {
-      throw new Error("Falha ao criar canal no RabbitMQ");
+      throw new Error("Falha ao criar canal no RabbitMQ!");
     }
 
     await assertQueue(channel, queueName);
