@@ -32,7 +32,7 @@ const speedLimiter = slowDown({
 
 // Configuração do logger para registro de segurança
 const logger = winston.createLogger({
-  level: "info",
+  level: "debug",
   format: winston.format.json(),
   transports: [new winston.transports.File({ filename: "security.log" })],
 });
@@ -49,16 +49,8 @@ module.exports = (io) => {
     async (req, res) => {
       let { email, senha } = req.body;
 
-      // Sanitização de dados de entrada:
-
-      console.log("Email digitado:", email);
-      console.log("Senha digitada:", senha);
-
-      email = email.replace(/[^\w@.-]/g, "");
-      senha = senha.replace(/[^\w]/g, "");
-
-      console.log("Email sanitizado:", email);
-      console.log("Senha sanitizada:", senha);
+      email = sanitizeHtml(email, { allowedTags: [], allowedAttributes: {} });
+      senha = sanitizeHtml(senha, { allowedTags: [], allowedAttributes: {} });
 
       try {
         // Verifica se o usuário já tentou logar antes
@@ -162,6 +154,7 @@ module.exports = (io) => {
     }
   });
 
+  // Rota para criar usuario
   router.post(
     "/users",
     limiter, // Aplicação do limite de taxa
@@ -183,19 +176,16 @@ module.exports = (io) => {
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const { email, senha } = req.body;
+      let { email, senha } = req.body;
+
+      email = sanitizeHtml(email, { allowedTags: [], allowedAttributes: {} });
+      senha = sanitizeHtml(senha, { allowedTags: [], allowedAttributes: {} });
 
       try {
         // Gerar o hash da senha
         const hashedSenha = await bcrypt.hash(senha, 10);
 
-        // Sanitize-html para garantir que o conteúdo do email não contenha nada além de texto puro.
-        const sanitizedEmail = sanitizeHtml(email, {
-          allowedTags: [],
-          allowedAttributes: {},
-        });
-
-        const user = new Usuario({ email: sanitizedEmail, senha: hashedSenha });
+        const user = new Usuario({ email: email, senha: hashedSenha });
 
         await user.save();
         res.status(200).json({ mensagem: "Usuário cadastrado com sucesso" });
@@ -209,8 +199,13 @@ module.exports = (io) => {
   // Rota para atualizar uma moeda
   router.put("/moedas/:id", authMiddleware, async (req, res) => {
     try {
-      const id = req.params.id;
-      const { nome, alta, baixa } = req.body;
+      let id = req.params.id;
+      let { nome, alta, baixa } = req.body;
+
+      id = sanitizeHtml(id, { allowedTags: [], allowedAttributes: {} });
+      nome = sanitizeHtml(nome, { allowedTags: [], allowedAttributes: {} });
+      alta = sanitizeHtml(alta, { allowedTags: [], allowedAttributes: {} });
+      baixa = sanitizeHtml(baixa, { allowedTags: [], allowedAttributes: {} });
 
       const moeda = await Moeda.findByIdAndUpdate(
         id,
@@ -233,7 +228,10 @@ module.exports = (io) => {
   // Rota para excluir uma moeda
   router.delete("/moedas/:id", authMiddleware, async (req, res) => {
     try {
-      const id = req.params.id;
+      let id = req.params.id;
+
+      id = sanitizeHtml(id, { allowedTags: [], allowedAttributes: {} });
+
       const moeda = await Moeda.findByIdAndDelete(id);
 
       if (!moeda) {
@@ -258,7 +256,12 @@ module.exports = (io) => {
 
   // Rota para enviar moedas utilizando RabbitMQ
   router.post("/moedas", (req, res, next) => {
-    const { nome, alta, baixa } = req.body;
+    let { nome, alta, baixa } = req.body;
+
+    nome = sanitizeHtml(nome, { allowedTags: [], allowedAttributes: {} });
+    alta = sanitizeHtml(alta, { allowedTags: [], allowedAttributes: {} });
+    baixa = sanitizeHtml(baixa, { allowedTags: [], allowedAttributes: {} });
+
     const moedas = { nome, alta, baixa };
 
     rabbitmq
