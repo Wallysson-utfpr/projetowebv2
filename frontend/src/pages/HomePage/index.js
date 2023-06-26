@@ -7,12 +7,11 @@ import "./styles.css";
 
 function HomePage() {
   const handleLogout = () => {
-    
     // Envia uma solicitação POST para a rota de logout no servidor
     const token = localStorage.getItem("token"); // Supondo que o token está armazenado no Local Storage
 
     axios
-      .post(
+      .delete(
         "http://localhost:3001/logout",
         {},
         {

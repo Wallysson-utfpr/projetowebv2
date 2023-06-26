@@ -226,3 +226,9 @@
 {"level":"info","message":"Moeda cadastrada:","nome":"aa"}
 {"level":"info","message":"Busca de moedas realizada"}
 {"level":"info","message":"Moeda excluída:","nome":"aa"}
+{"level":"error","message":"Erro de autenticação: E-mail ou senha incorretos"}
+{"level":"error","message":"Erro de autenticação: E-mail ou senha incorretos"}
+{"level":"error","message":"Erro de autenticação: E-mail ou senha incorretos"}
+{"level":"info","message":"Moeda cadastrada:","nome":"aa2"}
+{"level":"info","message":"Busca de moedas realizada"}
+{"level":"info","message":"Moeda excluída:","nome":"aa2"}

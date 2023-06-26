@@ -123,7 +123,7 @@ module.exports = (io) => {
   );
 
   // Rota para logout
-  router.post("/logout", authMiddleware, (req, res) => {
+  router.delete("/logout", authMiddleware, (req, res) => {
     try {
       const token = req.headers.authorization.split(" ")[1];
       //Adiciona tokens a uma lista negra
@@ -207,7 +207,7 @@ module.exports = (io) => {
   );
 
   // Rota para atualizar uma moeda
-  router.put("/moedas/:id", async (req, res) => {
+  router.put("/moedas/:id", authMiddleware, async (req, res) => {
     try {
       const id = req.params.id;
       const { nome, alta, baixa } = req.body;
@@ -231,7 +231,7 @@ module.exports = (io) => {
   });
 
   // Rota para excluir uma moeda
-  router.delete("/moedas/:id", async (req, res) => {
+  router.delete("/moedas/:id", authMiddleware, async (req, res) => {
     try {
       const id = req.params.id;
       const moeda = await Moeda.findByIdAndDelete(id);
